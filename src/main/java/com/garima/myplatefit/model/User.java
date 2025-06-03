@@ -19,6 +19,9 @@ public class User {
     private Integer age;
     private String gender;
     private String exerciseLevel;
+    private String profilePicturePath;
+    private String goal;
+
 
     // Getters and setters
     public Long getId() { return id; }
@@ -47,4 +50,10 @@ public class User {
 
     public String getExerciseLevel() { return exerciseLevel; }
     public void setExerciseLevel(String exerciseLevel) { this.exerciseLevel = exerciseLevel; }
+
+    public String getProfilePicturePath() { return profilePicturePath; }
+    public void setProfilePicturePath(String profilePicturePath) { this.profilePicturePath = profilePicturePath; }
+
+    public String getGoal() { return goal; }
+    public void setGoal(String goal) { this.goal = goal; }
 }

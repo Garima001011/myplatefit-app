@@ -6,6 +6,8 @@ import com.garima.myplatefit.model.WeightLog;
 import com.garima.myplatefit.repository.MealRepository;
 import com.garima.myplatefit.repository.UserRepository;
 import com.garima.myplatefit.repository.WeightLogRepository;
+import com.garima.myplatefit.service.CalorieRecommendationService;
+import com.garima.myplatefit.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -13,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class DashboardController {
@@ -26,6 +30,12 @@ public class DashboardController {
 
     @Autowired
     private MealRepository mealRepository;
+
+    @Autowired
+    private DashboardService dashboardService;
+
+    @Autowired
+    private CalorieRecommendationService calorieRecommendationService;
 
     @GetMapping("/dashboard")
     public String showDashboard(Authentication authentication, Model model) {
@@ -51,7 +61,8 @@ public class DashboardController {
         model.addAttribute("weightLog", new WeightLog());
         model.addAttribute("meal", new Meal());
         model.addAttribute("totalCalories", totalCalories);
-
+        double recommendedCalories = calorieRecommendationService.calculateTDEE(user);
+        model.addAttribute("recommendedCalories", recommendedCalories);
         return "dashboard";
     }
 
@@ -89,5 +100,18 @@ public class DashboardController {
         double height = 1.65; // Placeholder (you can make this user-specific later)
         double bmi = weight / (height * height);
         return String.format("%.1f", bmi);
+    }
+
+    @GetMapping("/chart-data")
+    @ResponseBody
+    public Map<String, Object> getChartData(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("weightLogs", dashboardService.getWeightLogs(user));
+        response.put("calorieLogs", dashboardService.getCalorieLogs(user));
+
+        return response;
     }
 }
