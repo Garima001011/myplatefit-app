@@ -27,13 +27,13 @@ jobs:
       - name: Build and package (skip tests)
         run: mvn clean package -DskipTests
 
-      # Checkmarx Static Code Scan (API triggered)
-      - name: Checkmarx SAST Scan
-        run: |
-          curl -X POST "https://your-checkmarx-url/api/scans" \
-            -H "Authorization: Bearer ${{ secrets.CHECKMARX_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{"projectId":"your-project-id","scanSettings":{"incremental":false}}'
+#      # Checkmarx Static Code Scan (API triggered)
+#      - name: Checkmarx SAST Scan
+#        run: |
+#          curl -X POST "https://your-checkmarx-url/api/scans" \
+#            -H "Authorization: Bearer ${{ secrets.CHECKMARX_TOKEN }}" \
+#            -H "Content-Type: application/json" \
+#            -d '{"projectId":"your-project-id","scanSettings":{"incremental":false}}'
 
       # Docker Build
       - name: Build Docker image
