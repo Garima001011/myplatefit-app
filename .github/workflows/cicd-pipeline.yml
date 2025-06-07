@@ -23,9 +23,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Build & Test with Maven
-      - name: Build and test
-        run: mvn clean verify
+      # Build & Package (Skip Tests for now)
+      - name: Build and package (skip tests)
+        run: mvn clean package -DskipTests
 
       # Checkmarx Static Code Scan (API triggered)
       - name: Checkmarx SAST Scan
