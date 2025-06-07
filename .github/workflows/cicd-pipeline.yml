@@ -1,15 +1,12 @@
-name: MyPlateFit CI/CD - DockerHub Version
+name: MyPlateFit CI/CD - Build & Test Only
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-docker:
+  build-test:
     runs-on: ubuntu-latest
-
-    env:
-      DOCKER_BUILDKIT: 1
 
     steps:
       - name: Checkout code
@@ -21,17 +18,5 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build without tests
-        run: mvn clean package -DskipTests
-
-      - name: Build Docker image
-        run: docker build -t myplatefit-app .
-
-      - name: DockerHub Login
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Tag Docker image
-        run: docker tag myplatefit-app ${{ secrets.DOCKERHUB_USERNAME }}/myplatefit-app:latest
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/myplatefit-app:latest
+      - name: Build and test with Maven
+        run: mvn clean verify
