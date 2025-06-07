@@ -1,48 +1,37 @@
-name: MyPlateFit Enterprise CI/CD
+name: MyPlateFit CI/CD - GitHub Packages Version
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-test-analyze:
+  build-docker:
     runs-on: ubuntu-latest
 
     env:
       DOCKER_BUILDKIT: 1
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Setup Java 17 for Maven
-      - name: Set up JDK 17
+      - name: Setup Java 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Build & Package (Skip Tests for now)
-      - name: Build and package (skip tests)
+      - name: Build without tests
         run: mvn clean package -DskipTests
 
-#      # Checkmarx Static Code Scan (API triggered)
-#      - name: Checkmarx SAST Scan
-#        run: |
-#          curl -X POST "https://your-checkmarx-url/api/scans" \
-#            -H "Authorization: Bearer ${{ secrets.CHECKMARX_TOKEN }}" \
-#            -H "Content-Type: application/json" \
-#            -d '{"projectId":"your-project-id","scanSettings":{"incremental":false}}'
-
-      # Docker Build
       - name: Build Docker image
         run: docker build -t myplatefit-app .
 
-      # Login to Artifactory (or DockerHub)
-      - name: Docker Login to Artifactory
-        run: echo ${{ secrets.ARTIFACTORY_PASSWORD }} | docker login ${{ secrets.ARTIFACTORY_URL }} -u ${{ secrets.ARTIFACTORY_USERNAME }} --password-stdin
+      - name: Log in to GitHub Packages Docker Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # Push Docker Image
-      - name: Push Docker image
-        run: docker tag myplatefit-app ${{ secrets.ARTIFACTORY_URL }}/myplatefit-app:latest && docker push ${{ secrets.ARTIFACTORY_URL }}/myplatefit-app:latest
+      - name: Tag Docker image for GitHub Packages
+        run: docker tag myplatefit-app ghcr.io/${{ github.repository_owner }}/myplatefit-app:latest
+
+      - name: Push Docker image to GitHub Packages
+        run: docker push ghcr.io/${{ github.repository_owner }}/myplatefit-app:latest
