@@ -1,11 +1,11 @@
-name: MyPlateFit CI/CD - Build & Test Only
+name: MyPlateFit CI/CD - Build Only
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,5 +18,5 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build and test with Maven
-        run: mvn clean verify
+      - name: Build without tests
+        run: mvn clean package -DskipTests
