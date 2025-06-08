@@ -36,6 +36,8 @@ public class SecurityConfig {
                                 "/login",
                                 "/forgot-password",
                                 "/reset-password",
+                                "/recipes",        // ✅ already allowed
+                                "/recipe/**",      // ✅ add this for details page
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"
@@ -48,6 +50,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout.permitAll());
+
         return http.build();
     }
 

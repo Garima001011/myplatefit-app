@@ -21,6 +21,7 @@ public class User {
     private String exerciseLevel;
     private String profilePicturePath;
     private String goal;
+    private Integer recommendedCalories;
 
 
     // Getters and setters
@@ -56,4 +57,7 @@ public class User {
 
     public String getGoal() { return goal; }
     public void setGoal(String goal) { this.goal = goal; }
+
+    public Integer getRecommendedCalories() { return recommendedCalories; }
+    public void setRecommendedCalories(Integer recommendedCalories) { this.recommendedCalories = recommendedCalories; }
 }
