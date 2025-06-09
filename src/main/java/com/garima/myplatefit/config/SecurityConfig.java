@@ -36,11 +36,13 @@ public class SecurityConfig {
                                 "/login",
                                 "/forgot-password",
                                 "/reset-password",
-                                "/recipes",        // ✅ already allowed
-                                "/recipe/**",      // ✅ add this for details page
+                                "/recipes",
+                                "/recipe/**",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**"
+                                "/images/**",
+                                "/api/chat",
+                                "/report/download"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -49,8 +51,13 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/dashboard", true)
                         .permitAll()
                 )
-                .logout(logout -> logout.permitAll());
-
+                .logout(logout -> logout.permitAll())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(
+                                "/api/chat",        // ✅ Disable CSRF for chatbot endpoint
+                                "/report/download"  // ✅ Disable CSRF for report download
+                        )
+                );
         return http.build();
     }
 

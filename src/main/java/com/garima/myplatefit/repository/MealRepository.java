@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface MealRepository extends JpaRepository<Meal, Long> {
     List<Meal> findByUserAndDate(User user, LocalDate date);
+    List<Meal> findByUserAndDateAfter(User user, LocalDate date);
 }

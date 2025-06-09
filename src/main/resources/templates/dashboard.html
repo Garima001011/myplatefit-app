@@ -6,84 +6,501 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .dashboard-card {
-            border-radius: 0.75rem;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
-            height: 100%;
-            transition: transform 0.2s;
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --secondary: #ff9800;
+            --dark: #1b5e20;
+            --light: #f5f9f5;
+            --gray: #e0e0e0;
+            --bmi-gradient: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+            --calories-gradient: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+            --weight-gradient: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+            --meals-gradient: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+            --log-weight-gradient: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+            --log-meal-gradient: linear-gradient(135deg, #c2185b 0%, #f48fb1 100%);
+            --chart-bg: rgba(255, 255, 255, 0.7);
+            --suggestions-bg: #ffffff;
         }
+
+        body {
+            background: linear-gradient(135deg, #f5f9f5 0%, #e8f5e9 100%);
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .dashboard-card {
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            background: white;
+            padding: 25px;
+            overflow: visible; /* Changed to visible for suggestions */
+            position: relative;
+            border: none;
+        }
+
         .dashboard-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .section-header {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        .logout-container {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        #suggestions {
+            max-height: 250px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 10000; /* Very high z-index to appear above everything */
+            background: var(--suggestions-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            display: none;
+            top: calc(100% + 10px);
+            left: 0;
+            border: 1px solid #e1e1e1;
+        }
+
+        /* Welcome section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-section::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .welcome-section h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-section .welcome-text {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-section .btn {
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .welcome-section .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        /* Stats cards */
+        .stat-card {
+            border-radius: 16px;
+            color: white;
+            padding: 25px;
+            height: 100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .stat-card .card-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 2.5rem;
+            opacity: 0.3;
+            z-index: 2;
+        }
+
+        .stat-card .card-content {
+            position: relative;
+            z-index: 3;
+        }
+
+        .stat-card h6 {
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .stat-card h3 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card small {
+            display: block;
+            font-weight: 500;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .bmi-card {
+            background: var(--bmi-gradient);
+        }
+
+        .calories-card {
+            background: var(--calories-gradient);
+        }
+
+        .weight-card {
+            background: var(--weight-gradient);
+        }
+
+        .meals-card {
+            background: var(--meals-gradient);
+        }
+
+        /* Log sections */
+        .log-section {
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: visible; /* Changed to visible for suggestions */
+        }
+
+        .log-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+            z-index: 1;
+            border-radius: 16px; /* Match container border-radius */
+        }
+
+        .log-section .section-header {
+            color: white;
+            z-index: 3;
+            position: relative;
+        }
+
+        .log-section .section-header::after {
+            background: white;
+        }
+
+        .log-weight-section {
+            background: var(--log-weight-gradient);
+        }
+
+        .log-meal-section {
+            background: var(--log-meal-gradient);
+        }
+
+        .log-section .form-control, .log-section .form-select {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            z-index: 3;
+            position: relative;
+        }
+
+        .log-section .form-control::placeholder, .log-section .form-select {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .log-section .form-control:focus, .log-section .form-select:focus {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            box-shadow: none;
+        }
+
+        .log-section .btn {
+            z-index: 3;
+            position: relative;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .log-section .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--chart-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Floating Chatbot Button */
+        #chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        #chatbot-btn .btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.5);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #chatbot-btn .btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(46, 125, 50, 0.7);
+        }
+
+        /* Suggestions styling */
+        .suggestion-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            color: #333;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f9ff;
+        }
+
+        .suggestion-item .food-name {
+            font-weight: 500;
+            flex-grow: 1;
+        }
+
+        .suggestion-item .calories {
+            color: #4caf50;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+
+            .stat-card h3 {
+                font-size: 1.8rem;
+            }
+
+            .log-section .form-control, .log-section .form-select {
+                margin-bottom: 10px;
+            }
+
+            #suggestions {
+                width: 100%;
+                left: 0;
+                top: calc(100% + 10px);
+            }
         }
     </style>
 </head>
 
 <body>
-<div class="container mt-5">
-    <div class="text-end mb-4">
-        <a href="/profile" class="btn btn-outline-primary btn-lg">👤 My Profile</a>
-        <a href="/meal-plan" class="btn btn-outline-success ms-2">🍽️ View Meal Plan</a>
+<div class="main-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-4 mb-md-0">
+                <h1>Welcome, <span th:text="${user.name}">Garima</span>!</h1>
+                <div class="welcome-text">Track your fitness journey with MyPlateFit</div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/profile" class="btn btn-light btn-sm">
+                    <i class="fas fa-user me-1"></i> My Profile
+                </a>
+                <a href="/meal-plan" class="btn btn-light btn-sm">
+                    <i class="fas fa-utensils me-1"></i> Meal Plan
+                </a>
+                <form th:action="@{/report/download}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-light btn-sm">
+                        <i class="fas fa-file-pdf me-1"></i> Download Report
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <h2 class="text-center text-success mb-4">Welcome, <span th:text="${user.name}">Garima</span>!</h2>
-
-    <!-- Quick Stats Section -->
+    <!-- Stats Cards -->
     <div class="row g-4 mb-4">
-        <div class="col-md-2">
-            <div class="p-3 bg-white dashboard-card text-center">
-                <h6 class="section-header">BMI</h6>
-                <h3 class="text-primary" th:text="${bmi}">--</h3>
+        <div class="col-md-3">
+            <div class="stat-card bmi-card">
+                <i class="fas fa-heartbeat card-icon"></i>
+                <div class="card-content">
+                    <h6>BMI</h6>
+                    <h3 th:text="${bmi}">23.5</h3>
+                    <small th:if="${bmi != null and bmi < 18.5}" class="text-warning">Underweight</small>
+                    <small th:if="${bmi != null and bmi >= 18.5 and bmi < 25}" class="text-success">Healthy</small>
+                    <small th:if="${bmi != null and bmi >= 25 and bmi < 30}" class="text-warning">Overweight</small>
+                    <small th:if="${bmi != null and bmi >= 30}" class="text-danger">Obese</small>
+                </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="p-3 bg-white dashboard-card text-center">
-                <h6 class="section-header">Today's Calories</h6>
-                <h3 class="text-success" th:text="${totalCalories}">0</h3>
+        <div class="col-md-3">
+            <div class="stat-card calories-card">
+                <i class="fas fa-fire card-icon"></i>
+                <div class="card-content">
+                    <h6>Today's Calories</h6>
+                    <h3 th:text="${totalCalories}">1,650</h3>
+                    <div class="progress mt-3 mb-2">
+                        <div class="progress-bar bg-white" role="progressbar"
+                             th:style="'width: ' + (${recommendedCalories} > 0 ? (${totalCalories} * 100 / ${recommendedCalories}) : 0) + '%;'">
+                        </div>
+                    </div>
+                    <small th:text="'of ' + ${recommendedCalories} + ' goal'">of 2,200 goal</small>
+                </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="p-3 bg-white dashboard-card text-center">
-                <h6 class="section-header">Weight Logs</h6>
-                <h3 class="text-warning" th:text="${logs.size()}">0</h3>
+        <div class="col-md-3">
+            <div class="stat-card weight-card">
+                <i class="fas fa-weight card-icon"></i>
+                <div class="card-content">
+                    <h6>Weight Logs</h6>
+                    <h3 th:text="${logs.size()}">12</h3>
+                    <small th:if="${logs != null and !logs.isEmpty()}" th:text="${logs[0].weight + ' kg' + ' current'}">72.5 kg current</small>
+                    <small th:if="${logs == null or logs.isEmpty()}">No data</small>
+                </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="p-3 bg-white dashboard-card text-center">
-                <h6 class="section-header">Meals Logged Today</h6>
-                <h3 class="text-info" th:text="${meals.size()}">0</h3>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="p-3 bg-white dashboard-card text-center">
-                <h6 class="section-header">Recommended Calories</h6>
-                <h3 class="text-info" th:text="${recommendedCalories}">0</h3>
+        <div class="col-md-3">
+            <div class="stat-card meals-card">
+                <i class="fas fa-utensils card-icon"></i>
+                <div class="card-content">
+                    <h6>Meals Logged</h6>
+                    <h3 th:text="${meals.size()}">24</h3>
+                    <small th:if="${meals != null and !meals.isEmpty()}" th:text="${meals[0].foodName}">Chicken Salad</small>
+                    <small th:if="${meals == null or meals.isEmpty()}">No meals logged</small>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Weight Log Form -->
-    <div class="p-4 bg-white dashboard-card mb-4">
-        <h4 class="section-header mb-3">📊 Log Weight</h4>
-        <form th:action="@{/addWeight}" th:object="${weightLog}" method="post" class="row g-3">
-            <div class="col-md-6">
-                <input type="number" th:field="*{weight}" step="0.1" class="form-control" placeholder="Enter weight (kg)" required>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Add</button>
-            </div>
+    <!-- Log Weight Section -->
+    <div class="log-section log-weight-section">
+        <h4 class="section-header">Log Weight</h4>
+        <form th:action="@{/addWeight}" th:object="${weightLog}" method="post" class="d-flex gap-3">
+            <input type="number" th:field="*{weight}" step="0.1" class="form-control" placeholder="Enter weight (kg)" required>
+            <button type="submit" class="btn btn-light">Add</button>
         </form>
     </div>
 
-    <!-- Meal Log Form -->
-    <div class="p-4 bg-white dashboard-card mb-4">
-        <h4 class="section-header mb-3">🍽️ Log Meal</h4>
+    <!-- Log Meal Section -->
+    <div class="log-section log-meal-section">
+        <h4 class="section-header">Log Meal</h4>
         <form th:action="@{/addMeal}" th:object="${meal}" method="post" class="row g-3">
             <div class="col-md-4 position-relative">
                 <input type="text" th:field="*{foodName}" placeholder="e.g. Chicken Breast" class="form-control" id="foodName" autocomplete="off" required>
-                <div id="suggestions" class="list-group position-absolute w-100 z-3" style="max-height: 200px; overflow-y: auto;"></div>
+                <div id="suggestions" class="list-group"></div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <select th:field="*{mealType}" class="form-select" required>
                     <option value="">Select Meal</option>
                     <option value="Breakfast">Breakfast</option>
@@ -93,112 +510,581 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="number" th:field="*{calories}" placeholder="Calories" class="form-control" required>
+                <input type="number" th:field="*{calories}" placeholder="Calories" class="form-control" id="caloriesInput" required>
             </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-success w-100">Add Meal</button>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-light w-100">Add Meal</button>
             </div>
         </form>
     </div>
 
-    <!-- Chart Section -->
-    <div class="p-4 bg-white dashboard-card mb-4">
-        <h4 class="section-header mb-3">📈 Trends</h4>
-        <div class="row">
-            <div class="col-md-6">
-                <canvas id="weightChart" height="300"></canvas>
-            </div>
-            <div class="col-md-6">
-                <canvas id="calorieChart" height="300"></canvas>
-            </div>
+    <!-- Charts -->
+    <div class="dashboard-card mb-4">
+        <h4 class="section-header">Weight Trends</h4>
+        <div class="chart-container">
+            <canvas id="weightChart" height="300"></canvas>
         </div>
     </div>
 
-    <!-- Logout -->
-    <div class="text-center mt-4 mb-5">
+    <div class="dashboard-card mb-4">
+        <h4 class="section-header">Calorie Intake</h4>
+        <div class="chart-container">
+            <canvas id="calorieChart" height="300"></canvas>
+        </div>
+    </div>
+
+    <div class="logout-container">
         <a href="/logout" class="btn btn-outline-danger">Logout</a>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Floating Chatbot Button -->
+<div id="chatbot-btn">
+    <button class="btn btn-success rounded-circle">
+        🤖
+    </button>
+</div>
 
-<!-- The full beautiful combined script you already have -->
+<!-- Chatbot Modal -->
+<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="chatModalLabel">AI Assistant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <textarea id="userPrompt" class="form-control" rows="4" placeholder="Ask anything..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <button id="sendBtn" class="btn btn-success w-100">Ask AI</button>
+                </div>
+                <div id="aiResponse" class="alert alert-light border"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const foodInput = document.getElementById('foodName');
-        const calorieInput = document.querySelector('[name="calories"]');
-        const suggestionsBox = document.getElementById('suggestions');
+        // Initialize charts
+        const weightCtx = document.getElementById('weightChart').getContext('2d');
+        const calorieCtx = document.getElementById('calorieChart').getContext('2d');
 
-        foodInput.addEventListener('input', async () => {
-            const query = foodInput.value.trim();
+        new Chart(weightCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Weight (kg)',
+                    data: [72.5, 72.0, 71.8, 71.5, 71.2, 70.8],
+                    borderColor: '#2e7d32',
+                    backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(calorieCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Calories',
+                    data: [1850, 2200, 1950, 2100, 2300, 2500, 2000],
+                    backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                    borderColor: 'rgba(46, 125, 50, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Fixed meal logging autocomplete
+        const foodInput = document.getElementById("foodName");
+        const calorieInput = document.getElementById("caloriesInput");
+        const suggestionsBox = document.getElementById("suggestions");
+
+        // Sample food database for demo
+        const foodDatabase = [
+            // --- Nepalese ---
+            { name: "Kwati Soup", calories: 180, mealType: "Lunch" },
+            { name: "Pani Puri", calories: 280, mealType: "Snack" },
+            { name: "Fulaura", calories: 190, mealType: "Snack" },
+            { name: "Kheer", calories: 220, mealType: "Dessert" },
+            { name: "Sandheko Wai Wai", calories: 310, mealType: "Snack" },
+            { name: "Samay Baji", calories: 500, mealType: "Lunch" },
+            { name: "Chatpate", calories: 270, mealType: "Snack" },
+            { name: "Buff Sukuti", calories: 340, mealType: "Dinner" },
+            { name: "Chhoyla", calories: 320, mealType: "Lunch" },
+            { name: "Bhatmas Sadheko", calories: 210, mealType: "Snack" },
+            { name: "Tama Aaloo", calories: 210, mealType: "Lunch" },
+            { name: "Bhakka", calories: 140, mealType: "Breakfast" },
+            { name: "Khashi Ko Masu", calories: 410, mealType: "Dinner" },
+            { name: "Tilhari", calories: 150, mealType: "Snack" },
+            { name: "Chana Chatpat", calories: 170, mealType: "Snack" },
+            { name: "Mithai Laddu", calories: 120, mealType: "Dessert" },
+            { name: "Phini", calories: 140, mealType: "Breakfast" },
+            { name: "Chiura Aalu", calories: 230, mealType: "Breakfast" },
+            { name: "Bhuteko Makai", calories: 180, mealType: "Snack" },
+            { name: "Kalo Dal", calories: 160, mealType: "Lunch" },
+            { name: "Egg Curry (Nepalese)", calories: 270, mealType: "Lunch" },
+            { name: "Mutton Sekuwa", calories: 360, mealType: "Dinner" },
+            { name: "Sapu Mhicha", calories: 210, mealType: "Snack" },
+            { name: "Aalu Chop", calories: 200, mealType: "Snack" },
+            { name: "Chiya and Biscuits", calories: 140, mealType: "Breakfast" },
+            { name: "Dal Bhat", calories: 450, mealType: "Lunch" },
+            { name: "Momo (10 pcs)", calories: 580, mealType: "Dinner" },
+            { name: "Sel Roti (1 pc)", calories: 210, mealType: "Breakfast" },
+            { name: "Aloo Tama", calories: 180, mealType: "Lunch" },
+            { name: "Yomari (2 pcs)", calories: 320, mealType: "Snack" },
+            { name: "Thukpa", calories: 350, mealType: "Dinner" },
+            { name: "Gundruk Ko Jhol", calories: 120, mealType: "Lunch" },
+            { name: "Chatamari", calories: 250, mealType: "Breakfast" },
+            { name: "Bara", calories: 220, mealType: "Snack" },
+            { name: "Sukuti", calories: 290, mealType: "Dinner" },
+
+            // --- Indian ---
+            { name: "Rajma Chawal", calories: 380, mealType: "Lunch" },
+            { name: "Pav Bhaji", calories: 430, mealType: "Dinner" },
+            { name: "Dhokla", calories: 160, mealType: "Breakfast" },
+            { name: "Pani Puri (6 pcs)", calories: 210, mealType: "Snack" },
+            { name: "Gulab Jamun (2 pcs)", calories: 250, mealType: "Dessert" },
+            { name: "Chicken Tikka", calories: 320, mealType: "Dinner" },
+            { name: "Fish Curry", calories: 270, mealType: "Lunch" },
+            { name: "Vegetable Korma", calories: 250, mealType: "Lunch" },
+            { name: "Dal Makhani", calories: 220, mealType: "Lunch" },
+            { name: "Daal Baati Churma", calories: 400, mealType: "Lunch" },
+            { name: "Egg Bhurji", calories: 250, mealType: "Breakfast" },
+            { name: "Mysore Pak", calories: 320, mealType: "Dessert" },
+            { name: "Vada Pav", calories: 330, mealType: "Snack" },
+            { name: "Pesarattu", calories: 190, mealType: "Breakfast" },
+            { name: "Malai Kofta", calories: 350, mealType: "Dinner" },
+            { name: "Kathi Roll", calories: 420, mealType: "Lunch" },
+            { name: "Paneer Butter Masala", calories: 410, mealType: "Dinner" },
+            { name: "Hyderabadi Dum Biryani", calories: 480, mealType: "Dinner" },
+            { name: "Poha", calories: 200, mealType: "Breakfast" },
+            { name: "Dahi Puri", calories: 180, mealType: "Snack" },
+            { name: "Kesar Peda", calories: 150, mealType: "Dessert" },
+            { name: "Puri Sabzi", calories: 320, mealType: "Breakfast" },
+            { name: "Chicken 65", calories: 310, mealType: "Snack" },
+            { name: "Medu Vada", calories: 220, mealType: "Breakfast" },
+            { name: "Butter Chicken", calories: 430, mealType: "Dinner" },
+            { name: "Palak Paneer", calories: 280, mealType: "Lunch" },
+            { name: "Chole Bhature", calories: 425, mealType: "Lunch" },
+            { name: "Masala Dosa", calories: 390, mealType: "Breakfast" },
+            { name: "Paneer Tikka", calories: 270, mealType: "Snack" },
+            { name: "Aloo Paratha", calories: 330, mealType: "Breakfast" },
+            { name: "Biryani (Chicken)", calories: 480, mealType: "Lunch" },
+            { name: "Samosa (2 pcs)", calories: 300, mealType: "Snack" },
+            { name: "Rogan Josh", calories: 360, mealType: "Dinner" },
+            { name: "Idli with Sambar", calories: 230, mealType: "Breakfast" },
+
+            // --- Asian (Chinese, Thai, Japanese, etc.) ---
+            { name: "General Tso's Chicken", calories: 550, mealType: "Dinner" },
+            { name: "Egg Fried Rice", calories: 350, mealType: "Lunch" },
+            { name: "Chicken Satay", calories: 330, mealType: "Dinner" },
+            { name: "Kimchi Fried Rice", calories: 400, mealType: "Lunch" },
+            { name: "Sushi (Salmon Nigiri, 6 pcs)", calories: 260, mealType: "Lunch" },
+            { name: "Japanese Curry Rice", calories: 420, mealType: "Dinner" },
+            { name: "Thai Green Curry", calories: 370, mealType: "Dinner" },
+            { name: "Egg Drop Soup", calories: 90, mealType: "Lunch" },
+            { name: "Hot and Sour Soup", calories: 120, mealType: "Lunch" },
+            { name: "Peking Duck (1 serving)", calories: 480, mealType: "Dinner" },
+            { name: "Bibimbap", calories: 430, mealType: "Lunch" },
+            { name: "Pho Bo", calories: 370, mealType: "Dinner" },
+            { name: "Dim Sum (Steamed Dumplings)", calories: 200, mealType: "Snack" },
+            { name: "Prawn Tempura", calories: 220, mealType: "Snack" },
+            { name: "Mango Sticky Rice", calories: 280, mealType: "Dessert" },
+            { name: "Tofu Stir Fry", calories: 250, mealType: "Lunch" },
+            { name: "Tom Yum Soup", calories: 160, mealType: "Lunch" },
+            { name: "Crispy Duck Bao", calories: 260, mealType: "Snack" },
+            { name: "Szechuan Noodles", calories: 360, mealType: "Dinner" },
+            { name: "Beef Bulgogi", calories: 430, mealType: "Dinner" },
+            { name: "Takoyaki (6 pcs)", calories: 270, mealType: "Snack" },
+            { name: "Okonomiyaki", calories: 340, mealType: "Lunch" },
+            { name: "Yakisoba", calories: 390, mealType: "Dinner" },
+            { name: "Katsu Curry", calories: 440, mealType: "Dinner" },
+            { name: "Kung Pao Chicken", calories: 420, mealType: "Dinner" },
+            { name: "Beef Chow Mein", calories: 510, mealType: "Lunch" },
+            { name: "Pad Thai", calories: 430, mealType: "Dinner" },
+            { name: "Sushi Roll (8 pcs)", calories: 300, mealType: "Lunch" },
+            { name: "Ramen Bowl", calories: 460, mealType: "Dinner" },
+            { name: "Spring Rolls (2 pcs)", calories: 140, mealType: "Snack" },
+            { name: "Miso Soup", calories: 80, mealType: "Lunch" },
+            { name: "Sweet & Sour Pork", calories: 350, mealType: "Dinner" },
+            { name: "Teriyaki Chicken", calories: 390, mealType: "Lunch" },
+            { name: "Dim Sum Platter", calories: 420, mealType: "Dinner" },
+
+            // --- American ---
+            { name: "Turkey Sandwich", calories: 290, mealType: "Lunch" },
+            { name: "BBQ Ribs (4 pcs)", calories: 490, mealType: "Dinner" },
+            { name: "Chicken Caesar Wrap", calories: 350, mealType: "Lunch" },
+            { name: "Eggs Benedict", calories: 350, mealType: "Breakfast" },
+            { name: "Apple Pie", calories: 320, mealType: "Dessert" },
+            { name: "BLT Sandwich", calories: 330, mealType: "Lunch" },
+            { name: "Club Sandwich", calories: 370, mealType: "Lunch" },
+            { name: "Pulled Pork Sandwich", calories: 420, mealType: "Dinner" },
+            { name: "Egg Salad Sandwich", calories: 260, mealType: "Lunch" },
+            { name: "Chicken Pot Pie", calories: 430, mealType: "Dinner" },
+            { name: "Meatloaf", calories: 390, mealType: "Dinner" },
+            { name: "Cobb Salad", calories: 410, mealType: "Lunch" },
+            { name: "Buffalo Chicken Pizza", calories: 520, mealType: "Dinner" },
+            { name: "Potato Wedges", calories: 260, mealType: "Snack" },
+            { name: "Onion Rings", calories: 300, mealType: "Snack" },
+            { name: "Pumpkin Pie", calories: 310, mealType: "Dessert" },
+            { name: "Chicken Quesadilla", calories: 480, mealType: "Lunch" },
+            { name: "Bagel with Cream Cheese", calories: 310, mealType: "Breakfast" },
+            { name: "Sausage McMuffin", calories: 410, mealType: "Breakfast" },
+            { name: "Hash Browns", calories: 170, mealType: "Breakfast" },
+            { name: "Strawberry Milkshake", calories: 320, mealType: "Snack" },
+            { name: "Grilled Ham & Cheese", calories: 370, mealType: "Lunch" },
+            { name: "Chili Cheese Dog", calories: 490, mealType: "Lunch" },
+            { name: "BBQ Chicken Salad", calories: 350, mealType: "Lunch" },
+            { name: "Steak Fajitas", calories: 440, mealType: "Dinner" },
+            { name: "Buttermilk Biscuits", calories: 210, mealType: "Breakfast" },
+            { name: "Breakfast Burrito", calories: 390, mealType: "Breakfast" },
+            { name: "Avocado Toast", calories: 270, mealType: "Breakfast" },
+            { name: "Banana Nut Muffin", calories: 310, mealType: "Breakfast" },
+            { name: "Shrimp Scampi", calories: 420, mealType: "Dinner" },
+            { name: "Chicken Alfredo", calories: 520, mealType: "Dinner" },
+            { name: "Churros", calories: 230, mealType: "Dessert" },
+            { name: "Pecan Pie", calories: 470, mealType: "Dessert" },
+            { name: "Blueberry Pancakes", calories: 370, mealType: "Breakfast" },
+            { name: "Waffles with Syrup", calories: 390, mealType: "Breakfast" },
+            { name: "Hot Dog", calories: 320, mealType: "Lunch" },
+            { name: "Loaded Nachos", calories: 600, mealType: "Snack" },
+            { name: "Chicken and Waffles", calories: 550, mealType: "Brunch" },
+            { name: "Eggplant Parmesan", calories: 340, mealType: "Dinner" },
+            { name: "Chicken Parmesan", calories: 450, mealType: "Dinner" },
+            { name: "French Toast", calories: 340, mealType: "Breakfast" },
+            { name: "Bacon & Eggs", calories: 310, mealType: "Breakfast" },
+            { name: "Omelette (Cheese & Veg)", calories: 260, mealType: "Breakfast" },
+            { name: "Pulled Chicken Sliders", calories: 330, mealType: "Snack" },
+            { name: "Sweet Potato Fries", calories: 250, mealType: "Snack" },
+            { name: "Pumpkin Soup", calories: 180, mealType: "Lunch" },
+            { name: "Cornbread", calories: 200, mealType: "Snack" },
+
+            // --- Continental/European/Mediterranean ---
+            { name: "Hummus & Pita", calories: 250, mealType: "Snack" },
+            { name: "Falafel Wrap", calories: 350, mealType: "Lunch" },
+            { name: "Shakshuka", calories: 290, mealType: "Breakfast" },
+            { name: "Caprese Salad", calories: 220, mealType: "Lunch" },
+            { name: "Baba Ganoush", calories: 180, mealType: "Snack" },
+            { name: "Pasta Carbonara", calories: 470, mealType: "Dinner" },
+            { name: "Beef Goulash", calories: 410, mealType: "Dinner" },
+            { name: "Chicken Paella", calories: 450, mealType: "Dinner" },
+            { name: "Focaccia Bread", calories: 230, mealType: "Snack" },
+            { name: "Chicken Shawarma", calories: 390, mealType: "Lunch" },
+            { name: "Gyro Sandwich", calories: 420, mealType: "Lunch" },
+            { name: "Pasta Primavera", calories: 340, mealType: "Lunch" },
+            { name: "Lamb Souvlaki", calories: 410, mealType: "Dinner" },
+            { name: "Tzatziki with Pita", calories: 180, mealType: "Snack" },
+            { name: "Croque Monsieur", calories: 360, mealType: "Lunch" },
+            { name: "Baguette with Butter", calories: 210, mealType: "Breakfast" },
+            { name: "Ratatouille", calories: 170, mealType: "Lunch" },
+            { name: "Chicken Cacciatore", calories: 400, mealType: "Dinner" },
+            { name: "Pesto Pasta", calories: 350, mealType: "Lunch" },
+            { name: "Minestrone Soup", calories: 160, mealType: "Lunch" },
+            { name: "Prosciutto Panini", calories: 380, mealType: "Lunch" },
+            { name: "Bruschetta", calories: 180, mealType: "Snack" },
+            { name: "Sicilian Cannoli", calories: 230, mealType: "Dessert" },
+            { name: "Tiramisu", calories: 310, mealType: "Dessert" },
+            { name: "Big Mac (McDonald's)", calories: 550, mealType: "Lunch" },
+            { name: "Quarter Pounder with Cheese (McDonald's)", calories: 630, mealType: "Lunch" },
+            { name: "Chicken McNuggets (10 pcs, McDonald's)", calories: 440, mealType: "Snack" },
+            { name: "Filet-O-Fish (McDonald's)", calories: 380, mealType: "Lunch" },
+            { name: "Egg McMuffin (McDonald's)", calories: 300, mealType: "Breakfast" },
+            { name: "Sausage Biscuit (McDonald's)", calories: 460, mealType: "Breakfast" },
+            { name: "French Fries (Medium, McDonald's)", calories: 320, mealType: "Snack" },
+            { name: "McFlurry Oreo (McDonald's)", calories: 510, mealType: "Dessert" },
+            { name: "McChicken (McDonald's)", calories: 400, mealType: "Lunch" },
+            { name: "Apple Pie (McDonald's)", calories: 240, mealType: "Dessert" },
+
+            { name: "Whopper (Burger King)", calories: 660, mealType: "Lunch" },
+            { name: "Original Chicken Sandwich (Burger King)", calories: 660, mealType: "Lunch" },
+            { name: "Chicken Fries (Burger King)", calories: 430, mealType: "Snack" },
+            { name: "Impossible Whopper (Burger King)", calories: 630, mealType: "Lunch" },
+            { name: "French Toast Sticks (Burger King)", calories: 350, mealType: "Breakfast" },
+            { name: "Hash Browns (Burger King)", calories: 250, mealType: "Breakfast" },
+            { name: "Onion Rings (Burger King)", calories: 320, mealType: "Snack" },
+            { name: "Cheeseburger (Burger King)", calories: 340, mealType: "Lunch" },
+            { name: "BK Chicken Nuggets (10 pcs, Burger King)", calories: 430, mealType: "Snack" },
+            { name: "Hershey’s Sundae Pie (Burger King)", calories: 310, mealType: "Dessert" },
+
+            { name: "Spicy Chicken Sandwich (Wendy's)", calories: 500, mealType: "Lunch" },
+            { name: "Baconator (Wendy's)", calories: 960, mealType: "Lunch" },
+            { name: "Jr. Bacon Cheeseburger (Wendy's)", calories: 370, mealType: "Snack" },
+            { name: "Frosty (Small, Wendy's)", calories: 340, mealType: "Dessert" },
+            { name: "Natural Cut Fries (Medium, Wendy's)", calories: 420, mealType: "Snack" },
+            { name: "Dave’s Single (Wendy's)", calories: 590, mealType: "Lunch" },
+            { name: "Grilled Chicken Sandwich (Wendy's)", calories: 370, mealType: "Lunch" },
+            { name: "Apple Bites (Wendy's)", calories: 35, mealType: "Snack" },
+            { name: "Breakfast Baconator (Wendy's)", calories: 730, mealType: "Breakfast" },
+            { name: "Classic Chicken Nuggets (6 pcs, Wendy's)", calories: 270, mealType: "Snack" },
+
+            { name: "Chicken Sandwich (Chick-fil-A)", calories: 440, mealType: "Lunch" },
+            { name: "Spicy Chicken Sandwich (Chick-fil-A)", calories: 490, mealType: "Lunch" },
+            { name: "Waffle Fries (Medium, Chick-fil-A)", calories: 400, mealType: "Snack" },
+            { name: "Chicken Nuggets (8 pcs, Chick-fil-A)", calories: 250, mealType: "Snack" },
+            { name: "Chicken Biscuit (Chick-fil-A)", calories: 450, mealType: "Breakfast" },
+            { name: "Egg White Grill (Chick-fil-A)", calories: 300, mealType: "Breakfast" },
+            { name: "Grilled Chicken Sandwich (Chick-fil-A)", calories: 380, mealType: "Lunch" },
+            { name: "Lemonade (Medium, Chick-fil-A)", calories: 220, mealType: "Snack" },
+            { name: "Cobb Salad with Chicken (Chick-fil-A)", calories: 850, mealType: "Lunch" },
+            { name: "Icedream Cone (Chick-fil-A)", calories: 180, mealType: "Dessert" },
+
+            { name: "Subway Club (6 inch, Subway)", calories: 310, mealType: "Lunch" },
+            { name: "Spicy Italian (6 inch, Subway)", calories: 480, mealType: "Lunch" },
+            { name: "Veggie Delite (6 inch, Subway)", calories: 230, mealType: "Lunch" },
+            { name: "Oven Roasted Chicken (6 inch, Subway)", calories: 320, mealType: "Lunch" },
+            { name: "Tuna Sub (6 inch, Subway)", calories: 480, mealType: "Lunch" },
+            { name: "Meatball Marinara (6 inch, Subway)", calories: 430, mealType: "Lunch" },
+            { name: "Turkey Breast (6 inch, Subway)", calories: 270, mealType: "Lunch" },
+            { name: "Steak & Cheese (6 inch, Subway)", calories: 360, mealType: "Lunch" },
+            { name: "Cookies (Chocolate Chip, Subway)", calories: 210, mealType: "Dessert" },
+            { name: "Egg & Cheese (6 inch, Subway)", calories: 380, mealType: "Breakfast" },
+
+            { name: "Supreme Pizza (2 slices, Pizza Hut)", calories: 540, mealType: "Lunch" },
+            { name: "Pepperoni Pizza (2 slices, Pizza Hut)", calories: 600, mealType: "Dinner" },
+            { name: "Cheese Breadsticks (Pizza Hut)", calories: 150, mealType: "Snack" },
+            { name: "Meat Lover’s Pizza (2 slices, Pizza Hut)", calories: 720, mealType: "Dinner" },
+            { name: "Wings (6 pcs, Pizza Hut)", calories: 400, mealType: "Snack" },
+            { name: "Stuffed Crust Cheese Pizza (2 slices, Pizza Hut)", calories: 650, mealType: "Dinner" },
+            { name: "Cinnabon Mini Rolls (Pizza Hut)", calories: 320, mealType: "Dessert" },
+            { name: "Tuscani Chicken Alfredo Pasta (Pizza Hut)", calories: 540, mealType: "Lunch" },
+            { name: "Garlic Knots (Pizza Hut)", calories: 210, mealType: "Snack" },
+            { name: "Chocolate Chip Cookie (Pizza Hut)", calories: 190, mealType: "Dessert" },
+
+            { name: "Chicken Sandwich (Popeyes)", calories: 700, mealType: "Lunch" },
+            { name: "Spicy Chicken Sandwich (Popeyes)", calories: 700, mealType: "Lunch" },
+            { name: "Cajun Fries (Popeyes)", calories: 270, mealType: "Snack" },
+            { name: "Biscuits (Popeyes)", calories: 210, mealType: "Snack" },
+            { name: "Red Beans and Rice (Popeyes)", calories: 250, mealType: "Lunch" },
+            { name: "Popcorn Shrimp (Popeyes)", calories: 340, mealType: "Snack" },
+            { name: "Mashed Potatoes with Gravy (Popeyes)", calories: 110, mealType: "Snack" },
+            { name: "Chicken Tenders (3 pcs, Popeyes)", calories: 445, mealType: "Snack" },
+            { name: "Apple Pie (Popeyes)", calories: 240, mealType: "Dessert" },
+            { name: "Cajun Rice (Popeyes)", calories: 170, mealType: "Lunch" },
+
+            { name: "Taco Supreme (Taco Bell)", calories: 190, mealType: "Snack" },
+            { name: "Crunchy Taco (Taco Bell)", calories: 170, mealType: "Snack" },
+            { name: "Doritos Locos Taco (Taco Bell)", calories: 170, mealType: "Snack" },
+            { name: "Chalupa Supreme (Taco Bell)", calories: 350, mealType: "Lunch" },
+            { name: "Beef Burrito (Taco Bell)", calories: 430, mealType: "Lunch" },
+            { name: "Chicken Quesadilla (Taco Bell)", calories: 510, mealType: "Lunch" },
+            { name: "Crunchwrap Supreme (Taco Bell)", calories: 540, mealType: "Lunch" },
+            { name: "Cheesy Gordita Crunch (Taco Bell)", calories: 500, mealType: "Lunch" },
+            { name: "Cinnamon Twists (Taco Bell)", calories: 170, mealType: "Dessert" },
+            { name: "Fiesta Taco Salad (Taco Bell)", calories: 760, mealType: "Lunch" },
+
+            { name: "Hand-Tossed Pepperoni Pizza (Domino's, 2 slices)", calories: 620, mealType: "Dinner" },
+            { name: "Cheesy Bread (Domino's)", calories: 180, mealType: "Snack" },
+            { name: "Chicken Wings (Domino's, 8 pcs)", calories: 480, mealType: "Snack" },
+            { name: "Cinna Stix (Domino's)", calories: 320, mealType: "Dessert" },
+            { name: "Beef 'n Cheddar (Arby's)", calories: 450, mealType: "Lunch" },
+            { name: "Classic Roast Beef Sandwich (Arby's)", calories: 360, mealType: "Lunch" },
+            { name: "Curly Fries (Medium, Arby's)", calories: 410, mealType: "Snack" },
+            { name: "Jamocha Shake (Arby's)", calories: 590, mealType: "Dessert" },
+            { name: "Chicken Tenders (3 pcs, Arby's)", calories: 370, mealType: "Snack" },
+            { name: "French Dip & Swiss (Arby's)", calories: 540, mealType: "Lunch" },
+            { name: "Mozzarella Sticks (Arby's)", calories: 440, mealType: "Snack" },
+            { name: "Arby's Reuben", calories: 680, mealType: "Lunch" },
+            { name: "Market Fresh Turkey Sandwich (Arby's)", calories: 710, mealType: "Lunch" },
+            { name: "Apple Turnover (Arby's)", calories: 430, mealType: "Dessert" },
+
+            { name: "Blizzard (Medium, Dairy Queen)", calories: 800, mealType: "Dessert" },
+            { name: "Chicken Strip Basket (4 pcs, Dairy Queen)", calories: 970, mealType: "Lunch" },
+            { name: "Cheeseburger (Dairy Queen)", calories: 400, mealType: "Lunch" },
+            { name: "Dilly Bar (Dairy Queen)", calories: 220, mealType: "Dessert" },
+            { name: "Onion Rings (Dairy Queen)", calories: 360, mealType: "Snack" },
+            { name: "Pretzel Sticks (Dairy Queen)", calories: 330, mealType: "Snack" },
+            { name: "Chili Cheese Dog (Dairy Queen)", calories: 400, mealType: "Lunch" },
+            { name: "Crispy Chicken Sandwich (Dairy Queen)", calories: 550, mealType: "Lunch" },
+            { name: "Fries (Medium, Dairy Queen)", calories: 320, mealType: "Snack" },
+            { name: "Brownie Batter Blizzard (Dairy Queen)", calories: 780, mealType: "Dessert" },
+
+            { name: "Orange Chicken (Panda Express)", calories: 490, mealType: "Lunch" },
+            { name: "Beijing Beef (Panda Express)", calories: 470, mealType: "Lunch" },
+            { name: "Broccoli Beef (Panda Express)", calories: 150, mealType: "Lunch" },
+            { name: "Kung Pao Chicken (Panda Express)", calories: 290, mealType: "Lunch" },
+            { name: "Fried Rice (Panda Express)", calories: 520, mealType: "Lunch" },
+            { name: "Chow Mein (Panda Express)", calories: 510, mealType: "Lunch" },
+            { name: "Honey Walnut Shrimp (Panda Express)", calories: 360, mealType: "Lunch" },
+            { name: "Egg Roll (Panda Express)", calories: 200, mealType: "Snack" },
+            { name: "Spring Roll (Panda Express)", calories: 190, mealType: "Snack" },
+            { name: "SweetFire Chicken Breast (Panda Express)", calories: 380, mealType: "Lunch" },
+
+            { name: "Chicken Burrito (Chipotle)", calories: 670, mealType: "Lunch" }
+        ];
+
+
+        // Debounce function to limit API calls
+        function debounce(func, timeout = 300) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
+        const showSuggestions = debounce((query) => {
             if (!query || query.length < 2) {
-                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
                 return;
             }
 
-            const res = await fetch(`/api/suggestions?query=${encodeURIComponent(query)}`);
-            const foods = await res.json();
+            try {
+                // Simulate API call
+                const filteredFoods = foodDatabase.filter(food =>
+                    food.name.toLowerCase().includes(query.toLowerCase())
+                );
 
-            suggestionsBox.innerHTML = '';
-            foods.forEach(item => {
-                const div = document.createElement('div');
-                div.classList.add('list-group-item', 'list-group-item-action');
-                div.textContent = item.description;
-                div.dataset.foodName = item.description;
+                suggestionsBox.innerHTML = '';
 
-                const energy = item.foodNutrients.find(n => n.nutrientName === 'Energy');
-                div.dataset.calories = energy ? Math.round(energy.value) : '';
+                if (filteredFoods.length === 0) {
+                    suggestionsBox.innerHTML = '<div class="suggestion-item">No results found</div>';
+                    suggestionsBox.style.display = 'block';
+                    return;
+                }
 
-                div.addEventListener('click', () => {
-                    foodInput.value = div.dataset.foodName;
-                    calorieInput.value = div.dataset.calories;
-                    suggestionsBox.innerHTML = '';
+                filteredFoods.forEach(item => {
+                    const div = document.createElement("div");
+                    div.classList.add("suggestion-item");
+
+                    div.innerHTML = `
+                        <div class="food-name">${item.name}</div>
+                        <div class="calories">${item.calories} kcal</div>
+                    `;
+
+                    div.addEventListener("click", () => {
+                        foodInput.value = item.name;
+                        calorieInput.value = item.calories;
+
+                        // Auto-select meal type if possible
+                        const mealTypeSelect = document.querySelector("[name='mealType']");
+                        if (mealTypeSelect) {
+                            for (let i = 0; i < mealTypeSelect.options.length; i++) {
+                                if (mealTypeSelect.options[i].value === item.mealType) {
+                                    mealTypeSelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        suggestionsBox.style.display = 'none';
+                    });
+
+                    suggestionsBox.appendChild(div);
                 });
 
-                suggestionsBox.appendChild(div);
-            });
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!suggestionsBox.contains(e.target) && e.target !== foodInput) {
-                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'block';
+            } catch (err) {
+                suggestionsBox.innerHTML = '<div class="suggestion-item text-danger">Error loading suggestions</div>';
+                suggestionsBox.style.display = 'block';
             }
         });
 
-        fetch('/chart-data')
-            .then(res => res.json())
-            .then(data => {
-                const weightCtx = document.getElementById('weightChart').getContext('2d');
-                new Chart(weightCtx, {
-                    type: 'line',
-                    data: {
-                        labels: data.weightLogs.map(w => w.date),
-                        datasets: [{
-                            label: 'Weight (kg)',
-                            data: data.weightLogs.map(w => w.weight),
-                            borderColor: '#2e7d32',
-                            backgroundColor: 'rgba(46,125,50,0.2)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    }
+        foodInput.addEventListener("input", (e) => {
+            showSuggestions(e.target.value);
+        });
+
+        // Show suggestions when input is focused
+        foodInput.addEventListener("focus", () => {
+            if (foodInput.value.length >= 2) {
+                showSuggestions(foodInput.value);
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener("click", (e) => {
+            if (e.target !== foodInput && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Chatbot functionality
+        const chatbotBtn = document.getElementById("chatbot-btn");
+        const sendBtn = document.getElementById("sendBtn");
+        const userPrompt = document.getElementById("userPrompt");
+        const aiResponse = document.getElementById("aiResponse");
+
+        chatbotBtn.addEventListener("click", function () {
+            const chatModal = new bootstrap.Modal(document.getElementById("chatModal"));
+            chatModal.show();
+        });
+
+        sendBtn.addEventListener("click", async function () {
+            const prompt = userPrompt.value.trim();
+            if (!prompt) return;
+
+            aiResponse.innerHTML = "<div class='spinner-border text-success' role='status'></div>";
+
+            try {
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(prompt)
                 });
 
-                const calorieCtx = document.getElementById('calorieChart').getContext('2d');
-                new Chart(calorieCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.calorieLogs.map(c => c.date),
-                        datasets: [{
-                            label: 'Calories',
-                            data: data.calorieLogs.map(c => c.calories),
-                            backgroundColor: 'rgba(56,142,60, 0.7)'
-                        }]
-                    }
-                });
-            });
+                const text = await response.text();
+                aiResponse.innerHTML = `<b>AI:</b> ${text}`;
+            } catch (err) {
+                aiResponse.innerHTML = "Error fetching AI response!";
+            }
+        });
     });
 </script>
-
 </body>
 </html>

@@ -125,6 +125,24 @@ Contact me via email or GitHub:
 > "Let food be thy medicine and medicine be thy food." - Hippocrates  
 > Built with ❤️ for a healthier world
 
----
+## 📸 App Gallery
+
+![Dashboard](src/main/resources/static/images/dashboard.png)
+*Dashboard View*
+
+![Profile](src/main/resources/static/images/profile.png)
+*User Profile Page*
+
+![Meal Log Entry](src/main/resources/static/images/Meal-log-entry.png)
+*Meal Log Entry Screen*
+
+![Meal Recipes](src/main/resources/static/images/meal-recipes.png)
+*Meal Recipes Suggestions*
+
+![PDF Report](src/main/resources/static/images/pdf-report.png)
+*PDF Report Example*
+
+![Chatbot.png](src/main/resources/static/images/Chatbot.png)
+*Chatbot Integration Using llama3*
 
 **Transform Your Nutrition Journey with MyPlateFit**

@@ -41,28 +41,25 @@ public class DashboardController {
     public String showDashboard(Authentication authentication, Model model) {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElse(null);
-
         if (user == null) return "redirect:/login";
 
-        // Fetch weight logs
         List<WeightLog> logs = weightLogRepository.findByUserOrderByDateDesc(user);
-
-        // Fetch today's meals
         List<Meal> mealsToday = mealRepository.findByUserAndDate(user, LocalDate.now());
 
-        // Calculate total calories today
+        // Calculate values as numbers
         int totalCalories = mealsToday.stream().mapToInt(Meal::getCalories).sum();
+        double recommendedCalories = calorieRecommendationService.calculateTDEE(user);
+        Double bmi = calculateBMI(logs, user); // Now returns Double
 
-        // Add attributes to model
         model.addAttribute("logs", logs);
         model.addAttribute("meals", mealsToday);
         model.addAttribute("user", user);
-        model.addAttribute("bmi", calculateBMI(logs));
+        model.addAttribute("bmi", bmi); // Numeric value
         model.addAttribute("weightLog", new WeightLog());
         model.addAttribute("meal", new Meal());
         model.addAttribute("totalCalories", totalCalories);
-        double recommendedCalories = calorieRecommendationService.calculateTDEE(user);
         model.addAttribute("recommendedCalories", recommendedCalories);
+
         return "dashboard";
     }
 
@@ -94,12 +91,11 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
-    private String calculateBMI(List<WeightLog> logs) {
-        if (logs.isEmpty()) return "N/A";
-        double weight = logs.get(0).getWeight(); // most recent
-        double height = 1.65; // Placeholder (you can make this user-specific later)
-        double bmi = weight / (height * height);
-        return String.format("%.1f", bmi);
+    private Double calculateBMI(List<WeightLog> logs, User user) {
+        if (logs.isEmpty()) return null;
+        double weight = logs.get(0).getWeight();
+        double height = user.getHeight() / 100.0; // Convert cm to meters
+        return weight / (height * height);
     }
 
     @GetMapping("/chart-data")
