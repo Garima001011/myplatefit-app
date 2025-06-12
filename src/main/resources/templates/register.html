@@ -5,120 +5,784 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #ff9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: #e8f5e9;
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .register-wrapper {
-            max-width: 960px;
-            margin: auto;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 128, 0, 0.1);
-            background: white;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+            min-height: 100vh;
             display: flex;
-            flex-wrap: wrap;
-            min-height: 600px; /* ⬅️ Ensures image side is visible */
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .image-side {
-            flex: 1;
-            background: url('https://images.unsplash.com/photo-1572441710533-6bab42b90aa4?fit=crop&w=800&h=600&q=80') center/cover no-repeat;
-            min-height: 600px;
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('/images/healthy-picture.jpg') center/cover no-repeat fixed;
+            opacity: 0.15;
+            z-index: -1;
         }
 
-        .form-side {
+        .register-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .register-card {
+            display: flex;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: white;
+            box-shadow: var(--box-shadow);
+            min-height: 700px;
+            transition: var(--transition);
+        }
+
+        .register-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .image-panel {
             flex: 1;
-            padding: 2rem;
-            min-width: 300px;
+            background: url('/images/health-banner.png') center/cover no-repeat;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            transition: var(--transition);
+        }
+
+        .image-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 60%);
+            z-index: 1;
+        }
+
+        .image-overlay-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+
+        .image-overlay-content h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .image-overlay-content p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .form-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #ffffff;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
         }
 
         .brand-title {
-            color: #2e7d32;
-            font-weight: bold;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
         }
-        label {
+
+        .brand-subtitle {
+            color: var(--gray);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 25px;
+        }
+
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
             font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-light);
+            font-size: 16px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+            background-color: white;
+            outline: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 8px;
+            background: #e9ecef;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .password-strength-meter {
+            height: 100%;
+            width: 0;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .form-col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 150px;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--gray);
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .login-link a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-steps {
+            display: flex;
+            position: relative;
+        }
+
+        .step {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+            z-index: 2;
+            margin: 0 40px;
+        }
+
+        .step.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e9ecef;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .step-text {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .step.active .step-text {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .register-card {
+                flex-direction: column;
+                max-width: 600px;
+            }
+
+            .image-panel {
+                min-height: 250px;
+                flex: none;
+            }
+
+            .form-panel {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-panel {
+                padding: 25px 15px;
+            }
+
+            .brand-title {
+                font-size: 1.8rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                margin: 0;
+            }
+
+            .form-col {
+                padding: 0;
+                margin-bottom: 15px;
+            }
+
+            .step {
+                margin: 0 20px;
+            }
+        }
+
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            background: var(--primary);
+            top: 10%;
+            left: 5%;
+            animation-duration: 20s;
+        }
+
+        .shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            background: var(--secondary);
+            top: 70%;
+            left: 80%;
+            animation-duration: 25s;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: var(--primary-light);
+            top: 40%;
+            left: 90%;
+            animation-duration: 15s;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(-50px, 50px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 100px) rotate(180deg);
+            }
+            75% {
+                transform: translate(50px, 50px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .btn-nav {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-prev {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <div class="d-flex flex-column flex-md-row shadow rounded-4 overflow-hidden" style="background: white; min-height: 600px;">
+<div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
 
-        <!-- 📷 Left Side Image -->
-        <div class="image-side d-none d-md-block" style="flex: 1; min-height: 600px;
-     background: url('/images/health-banner.png') center/cover no-repeat;">
+<div class="register-container">
+    <div class="register-card">
+        <!-- Left Panel Image -->
+        <div class="image-panel">
+            <div class="image-overlay-content">
+                <h3>Begin Your Health Journey</h3>
+                <p>Personalized nutrition plans tailored to your goals and lifestyle</p>
+            </div>
         </div>
 
+        <!-- Right Panel Form -->
+        <div class="form-panel">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-apple-alt"></i>
+                </div>
+                <h1 class="brand-title">MyPlateFit</h1>
+                <p class="brand-subtitle">Create your account to get started</p>
+            </div>
 
-        <!-- 📝 Right Side Form -->
-        <div class="form-side p-4" style="flex: 1; min-width: 320px;">
-            <h2 class="text-center brand-title mb-4">Join MyPlateFit</h2>
-            <form th:action="@{/register}" th:object="${user}" method="post">
-                <div class="mb-3">
-                    <label>Full Name</label>
-                    <input type="text" th:field="*{name}" class="form-control" placeholder="Garima Sharma" required>
-                </div>
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" th:field="*{email}" class="form-control" placeholder="you@example.com" required>
-                </div>
-                <div class="mb-3">
-                    <label>Password</label>
-                    <input type="password" th:field="*{password}" class="form-control" placeholder="********" required>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label>Weight (kg)</label>
-                        <input type="number" th:field="*{weight}" class="form-control" placeholder="e.g., 60">
+            <div class="progress-container">
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        1
+                        <div class="step-text">Personal</div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Height (cm)</label>
-                        <input type="number" th:field="*{height}" class="form-control" placeholder="e.g., 165">
+                    <div class="step" data-step="2">
+                        2
+                        <div class="step-text">Body</div>
                     </div>
+                    <div class="step" data-step="3">
+                        3
+                        <div class="step-text">Goals</div>
+                    </div>
+                    <div class="step-line"></div>
                 </div>
-                <div class="mb-3">
-                    <label>Age</label>
-                    <input type="number" th:field="*{age}" class="form-control" placeholder="e.g., 25">
-                </div>
-                <div class="mb-3">
-                    <label>Gender</label>
-                    <select th:field="*{gender}" class="form-select">
-                        <option value="">Select...</option>
-                        <option value="Female">Female</option>
-                        <option value="Male">Male</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label>Exercise Level</label>
-                    <select th:field="*{exerciseLevel}" class="form-select">
-                        <option value="">Select...</option>
-                        <option value="None">None</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="Active">Active</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label>Weight Goal</label>
-                    <select th:field="*{goal}" class="form-select">
-                        <option value="">Select...</option>
-                        <option value="Maintain">Maintain Weight</option>
-                        <option value="Lose">Lose Weight</option>
-                        <option value="Gain">Gain Weight</option>
-                    </select>
-                </div>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success">Register</button>
-                </div>
-                <div class="text-center mt-3">
-                    <small>Already have an account? <a href="/login">Login here</a></small>
-                </div>
-            </form>
+            </div>
+
+            <div class="form-container">
+                <form th:action="@{/register}" th:object="${user}" method="post" id="registrationForm">
+                    <!-- Step 1: Personal Information -->
+                    <div class="form-section active" id="step1">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <div class="input-group">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" th:field="*{name}" class="form-control" placeholder="Garima Sharma" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" th:field="*{email}" class="form-control" placeholder="you@example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" th:field="*{password}" id="password" class="form-control" placeholder="••••••••" required>
+                                <button type="button" class="password-toggle" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength">
+                                <div class="password-strength-meter" id="passwordStrength"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-nav btn-prev" disabled>Previous</button>
+                            <button type="button" class="btn-nav btn-next" id="nextToStep2">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Body Information -->
+                    <div class="form-section" id="step2">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Age</label>
+                                    <div class="input-group">
+                                        <i class="fas fa-birthday-cake input-icon"></i>
+                                        <input type="number" th:field="*{age}" class="form-control" placeholder="e.g., 25" min="1" max="120">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <div class="input-group">
+                                        <i class="fas fa-venus-mars input-icon"></i>
+                                        <select th:field="*{gender}" class="form-control">
+                                            <option value="">Select...</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Weight (kg)</label>
+                                    <div class="input-group">
+                                        <i class="fas fa-weight input-icon"></i>
+                                        <input type="number" th:field="*{weight}" class="form-control" placeholder="e.g., 60" min="1" max="500">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label>Height (cm)</label>
+                                    <div class="input-group">
+                                        <i class="fas fa-ruler-vertical input-icon"></i>
+                                        <input type="number" th:field="*{height}" class="form-control" placeholder="e.g., 165" min="1" max="300">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-nav btn-prev" id="backToStep1">Previous</button>
+                            <button type="button" class="btn-nav btn-next" id="nextToStep3">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Goals and Preferences -->
+                    <div class="form-section" id="step3">
+                        <div class="form-group">
+                            <label>Exercise Level</label>
+                            <div class="input-group">
+                                <i class="fas fa-running input-icon"></i>
+                                <select th:field="*{exerciseLevel}" class="form-control">
+                                    <option value="">Select your activity level</option>
+                                    <option value="None">Sedentary (little or no exercise)</option>
+                                    <option value="Moderate">Moderate (exercise 1-3 times/week)</option>
+                                    <option value="Active">Active (exercise 4-5 times/week)</option>
+                                    <option value="VeryActive">Very Active (intense exercise 6-7 times/week)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Weight Goal</label>
+                            <div class="input-group">
+                                <i class="fas fa-bullseye input-icon"></i>
+                                <select th:field="*{goal}" class="form-control">
+                                    <option value="">Select your goal</option>
+                                    <option value="Maintain">Maintain Weight</option>
+                                    <option value="Lose">Lose Weight</option>
+                                    <option value="Gain">Gain Weight</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Target Calories (optional)</label>
+                            <div class="input-group">
+                                <i class="fas fa-fire input-icon"></i>
+                                <input type="number" class="form-control" placeholder="e.g., 2000" min="500" max="5000">
+                            </div>
+                            <small class="text-muted">We'll calculate this automatically if not specified</small>
+                        </div>
+
+                        <div class="form-group form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-nav btn-prev" id="backToStep2">Previous</button>
+                            <button type="submit" class="btn-register">Create Account</button>
+                        </div>
+                    </div>
+                </form>
+
+                <p class="login-link">
+                    Already have an account? <a href="/login">Sign in here</a>
+                </p>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Form steps navigation
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const steps = document.querySelectorAll('.step');
+
+    document.getElementById('nextToStep2').addEventListener('click', function() {
+        step1.classList.remove('active');
+        step2.classList.add('active');
+        updateStep(2);
+    });
+
+    document.getElementById('backToStep1').addEventListener('click', function() {
+        step2.classList.remove('active');
+        step1.classList.add('active');
+        updateStep(1);
+    });
+
+    document.getElementById('nextToStep3').addEventListener('click', function() {
+        step2.classList.remove('active');
+        step3.classList.add('active');
+        updateStep(3);
+    });
+
+    document.getElementById('backToStep2').addEventListener('click', function() {
+        step3.classList.remove('active');
+        step2.classList.add('active');
+        updateStep(2);
+    });
+
+    function updateStep(stepNumber) {
+        steps.forEach(step => {
+            if (parseInt(step.dataset.step) <= stepNumber) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+            }
+        });
+    }
+
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // Password strength indicator
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+
+        if (password.length >= 6) strength += 25;
+        if (password.length >= 8) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[0-9]/.test(password)) strength += 25;
+
+        document.getElementById('passwordStrength').style.width = strength + '%';
+        document.getElementById('passwordStrength').style.background =
+            strength < 50 ? '#f44336' : strength < 75 ? '#ff9800' : '#4caf50';
+    });
+
+    // Add focus effect to inputs
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.parentElement.classList.remove('focused');
+        });
+    });
+</script>
 </body>
 </html>
